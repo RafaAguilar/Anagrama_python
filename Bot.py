@@ -6,71 +6,55 @@ Created on 04/09/2012
 #import threading
 from multiprocessing import Process
 
+
 class Bot(Process):
     '''
     classdocs
     '''
 
-    def __init__(self,nombre,diccL,intento,master):
-        #threading.Thread.__init__(self)
-        Process.__init__(self) 
-        self.nombre=nombre
-        self.diccL=diccL
-        self.intento=intento
-        #self.ini=ini
-        #self.fini=fini        
-        
-        self.master=master
-        self.lockM=self.master.lockM
+    def __init__(self, nombre, diccL, intento, master):
+        Process.__init__(self)
+        self.nombre = nombre
+        self.diccL = diccL
+        self.intento = intento
+        self.master = master
+        self.lockM = self.master.lockM
+
     def buscarAlt(self):
-        #self.master.lockM.acquire()
-        #print self.intento.__len__()
-        #self.master.lockM.release()
-        #for inten in self.intento:
-        while (self.intento.__length_hint__()>0):
-            inten=self.intento.next()
-            inten=inten.__str__().replace('\'','').replace(',','').replace(' ','').strip('()').strip()
-            
-            #self.master.lockM.acquire()
-            
-            #print self.nombre+":"+inten
-            #print inten
-            #self.master.lockM.release()
-            for palabra in self.diccL:
-                if palabra==(inten):
-                    self.master.lockM.acquire()
-                    print "Anagrama-> " + self.nombre+":"+palabra
-                    self.master.lockM.release()
-            del inten        
+        first = True
+        try:
+            while (True):
+                inten = self.intento.__next__()
+                if first:
+                    print('{}: Nuevo slice desde {}'.format(self.name, ''.join(inten)))
+                    first = False
+                inten = inten.__str__().replace('\'', '').replace(
+                    ',', '').replace(' ', '').strip('()').strip()
+                for palabra in self.diccL:
+                    if palabra == (inten):
+                        self.master.lockM.acquire()
+                        print("Anagrama-> " + self.nombre + ":" + palabra)
+                        self.master.lockM.release()
+                del inten
+        except StopIteration:
+            pass
         self.master.lockM.acquire()
-            
-        print self.nombre+":Finalize"
-        
+        print(self.nombre + ":Finalize")
         self.master.lockM.release()
-        
         self.master.botsS.release()
-               
+
     def buscar(self):
-        consiguio=False
-        
-        #print "Empieza a buscar"
-        #sprint self.intento
-        intento=self.intento.__str__().replace('\'','').replace(',','').replace(' ','').strip('()').strip()
-        #self.master.lockM.acquire()
-        #print self.nombre + ":" + intento
-        #self.master.lockM.release()
-        for palabra in self.diccL:                        
-            #print palabra + ":" + intento
-            if palabra==intento:
-                print "Anagrama-> " + self.nombre+":"+palabra
-                consiguio=True
-                #self.master.guardaCoincidencia(palabra)
-            
+        consiguio = False
+        intento = self.intento.__str__().replace('\'', '').replace(
+            ',', '').replace(' ', '').strip('()').strip()
+        for palabra in self.diccL:
+            if palabra == intento:
+                print("Anagrama-> " + self.nombre + ":" + palabra)
+                consiguio = True
         return consiguio
-    
-    
+
     def pedirIntento(self):
         self.intento = self.master.genIntento()
-        
+
     def run(self):
         self.buscarAlt()
