@@ -1,3 +1,3 @@
 import master
-m=master.Master("teologia")
+m=master.Master("altisonancia")
 m.alternativo()

@@ -16,10 +16,7 @@ import time
 
 
 def npermutations(l):
-    num = factorial(len(l))
-    mults = Counter(l).values()
-    den = reduce(operator.mul, (factorial(v) for v in mults), 1)
-    return num / den
+    return factorial(len(l))
 
 
 class Master(object):
@@ -36,9 +33,9 @@ class Master(object):
         self.intentos = set()
         self.resultados = set()
         self.dicc = open("diccionario_venezuela")
-        self.diccL = list()
+        self.diccL = set()
         for i in range(0, 71937):
-            self.diccL.append(self.dicc.readline().strip())
+            self.diccL.add(self.dicc.readline().strip())
         self.lockM = multiprocessing.Lock()
         self.botsS = multiprocessing.Semaphore(self.cores)
         self.permutaciones = itertools.permutations(self.base)
@@ -70,7 +67,7 @@ class Master(object):
             self.lockM.release()
             ini = int((i * self.lenght) / self.cores)
             fini = int((self.lenght / self.cores) * (i + 1))
-            print(ini, fini, fini - ini)
+            #print(ini, fini, fini - ini, self.lenght)
             b = Bot.Bot("bot" + str(i), self.diccL,
                         itertools.islice(self.permutaciones, ini, fini), self)
             b.start()

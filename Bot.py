@@ -3,7 +3,7 @@ Created on 04/09/2012
 
 @author: rafa
 '''
-#import threading
+import copy
 from multiprocessing import Process
 
 
@@ -22,19 +22,22 @@ class Bot(Process):
 
     def buscarAlt(self):
         first = True
+        i = 0
         try:
             while (True):
+                i += 1
                 inten = self.intento.__next__()
                 if first:
-                    print('{}: Nuevo slice desde {}'.format(self.name, ''.join(inten)))
+                    #print('{}: Nuevo slice desde {}'.format(self.name, ''.join(inten)))
                     first = False
-                inten = inten.__str__().replace('\'', '').replace(
-                    ',', '').replace(' ', '').strip('()').strip()
-                for palabra in self.diccL:
-                    if palabra == (inten):
-                        self.master.lockM.acquire()
-                        print("Anagrama-> " + self.nombre + ":" + palabra)
-                        self.master.lockM.release()
+                if ''.join(inten) == "luciernaga":
+                        print(''.join(inten).strip())
+                intent = ''.join(inten)
+                #for palabra in self.diccL:
+                if intent in self.diccL:
+                    self.master.lockM.acquire()
+                    print("Anagrama-> " + self.nombre + ":" + intent + ' en el intento {}'.format(i))
+                    self.master.lockM.release()
                 del inten
         except StopIteration:
             pass
